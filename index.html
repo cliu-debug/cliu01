@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>测试同一URL</title>
+    <title>test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --pc-primary: #3498db;
             --mobile-primary: #2ecc71;
             --dark-bg: #2c3e50;
             --light-bg: #ecf0f1;
+            --transition: all 0.3s ease;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
         * {
@@ -29,27 +32,47 @@
             transition: background 0.5s ease;
         }
         
-        .device-banner {
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 18px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2000;
+            background: radial-gradient(circle, #3498db, #2c3e50);
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        .loading h2 {
             color: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            animation: fadeIn 0.8s ease-out;
+            font-size: 1.5rem;
         }
         
-        .pc-banner {
-            background: linear-gradient(90deg, var(--pc-primary), var(--dark-bg));
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
-        .mobile-banner {
-            background: linear-gradient(90deg, var(--mobile-primary), #27ae60);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
         
         .container {
@@ -76,6 +99,19 @@
             color: white;
             padding: 30px;
             border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pc-sidebar::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
         }
         
         .pc-main {
@@ -89,13 +125,32 @@
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
+            transition: var(--transition);
             border: 1px solid #eaeaea;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pc-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--pc-primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
         }
         
         .pc-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pc-card:hover::after {
+            transform: scaleX(1);
         }
         
         /* 移动端样式 */
@@ -110,6 +165,19 @@
             border-radius: 15px 15px 0 0;
             margin-bottom: 20px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mobile-header::before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
         }
         
         .mobile-content {
@@ -121,15 +189,40 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow);
             border: 1px solid #e0e0e0;
+            transition: var(--transition);
         }
         
-        /* 通用样式 */
+        .mobile-card:hover {
+            transform: translateY(-5px);
+        }
+        
         h1 {
             font-size: 2.2rem;
             margin-bottom: 15px;
             color: var(--dark-bg);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .pc-container h1 {
+            color: white;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--pc-primary);
+            border-radius: 3px;
+        }
+        
+        .mobile-container h1::after {
+            background: var(--mobile-primary);
         }
         
         h2 {
@@ -142,6 +235,25 @@
             font-size: 1.3rem;
             margin-bottom: 12px;
             color: var(--dark-bg);
+            display: flex;
+            align-items: center;
+        }
+        
+        h3 i {
+            margin-right: 10px;
+            background: var(--pc-primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+        
+        .mobile-container h3 i {
+            background: var(--mobile-primary);
         }
         
         p {
@@ -163,6 +275,12 @@
             border-radius: 10px;
             flex: 1;
             margin: 0 5px;
+            transition: var(--transition);
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
         }
         
         .stat-value {
@@ -183,9 +301,13 @@
         
         .feature-list li {
             padding: 10px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
+        }
+        
+        .pc-sidebar .feature-list li {
+            color: rgba(255, 255, 255, 0.9);
         }
         
         .feature-list li:before {
@@ -209,7 +331,20 @@
             margin: 20px 0;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mobile-action::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
         }
         
         .mobile-action:hover {
@@ -218,36 +353,104 @@
             box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
         }
         
-        .loading {
+        .mobile-action:hover::after {
+            left: 100%;
+        }
+        
+        .visual-area {
+            height: 200px;
+            border-radius: 10px;
+            margin-top: 15px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 100vh;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
         }
         
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(52, 152, 219, 0.2);
+        .visual-area::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .visual-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .grid-item {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            transition: var(--transition);
+            font-weight: bold;
+        }
+        
+        .grid-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .theme-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        
+        .theme-selector:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .theme-color {
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            border-top-color: var(--pc-primary);
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            margin-right: 10px;
+            flex-shrink: 0;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .stats-bar span {
+            font-size: 0.9rem;
         }
         
-        @keyframes scaleIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .progress-bar {
+            height: 10px;
+            background: #bbdefb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-value {
+            height: 100%;
+            background: #2196f3;
+            border-radius: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+            font-size: 0.9rem;
         }
         
         @media (max-width: 768px) {
@@ -259,100 +462,6 @@
                 grid-template-columns: 1fr;
             }
         }
-        
-        /* 部署指南样式 */
-        .deployment-guide {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .deployment-guide h2 {
-            color: var(--dark-bg);
-            border-bottom: 2px solid var(--pc-primary);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .deployment-steps {
-            counter-reset: step-counter;
-        }
-        
-        .deployment-step {
-            position: relative;
-            padding-left: 70px;
-            margin-bottom: 30px;
-        }
-        
-        .deployment-step:before {
-            counter-increment: step-counter;
-            content: counter(step-counter);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 50px;
-            height: 50px;
-            background: var(--pc-primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .deployment-step h3 {
-            margin-bottom: 10px;
-            color: var(--dark-bg);
-        }
-        
-        .deployment-step p {
-            margin-bottom: 15px;
-        }
-        
-        .code-block {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-            margin: 15px 0;
-            font-size: 14px;
-        }
-        
-        .provider-logos {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        
-        .provider-logo {
-            width: 120px;
-            height: 120px;
-            background: white;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .provider-logo:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        
-        .provider-logo img {
-            max-width: 90%;
-            max-height: 90%;
-        }
     </style>
 </head>
 <body>
@@ -362,18 +471,15 @@
         <h2>...</h2>
     </div>
     
-    <!-- 设备类型标识 -->
-    <div class="device-banner" id="deviceBanner"></div>
-    
     <!-- PC端布局 -->
     <div class="container" id="pcContainer">
         <div class="pc-container">
             <div class="pc-sidebar">
-                <h1 style="color: white;">电脑端专属体验</h1>
+                <h1>电脑端专属体验</h1>
                 <p>专为大屏幕优化设计，提供完整的桌面体验。</p>
                 
                 <div style="margin-top: 30px;">
-                    <h3 style="color: #ecf0f1;">桌面功能</h3>
+                    <h3><i class="fas fa-desktop"></i>桌面功能</h3>
                     <ul class="feature-list">
                         <li>多任务并行处理</li>
                         <li>复杂数据可视化</li>
@@ -390,35 +496,35 @@
                     </div>
                     <div class="stat-item">
                         <div class="stat-value">12x</div>
-                        <div class="stat-label">工作效率提升</div>
+                        <div class="stat-label">效率提升</div>
                     </div>
                 </div>
             </div>
             
             <div class="pc-main">
                 <div class="pc-card">
-                    <h2>数据分析仪表盘</h2>
+                    <h2><i class="fas fa-chart-line"></i>数据分析仪表盘</h2>
                     <p>实时监控业务数据，支持多种可视化图表类型，包括折线图、柱状图、饼图等。</p>
-                    <div style="height: 200px; background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%); border-radius: 10px; margin-top: 15px; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">
+                    <div class="visual-area" style="background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);">
                         交互式数据可视化区域
                     </div>
                 </div>
                 
                 <div class="pc-card">
-                    <h2>多任务管理</h2>
+                    <h2><i class="fas fa-tasks"></i>多任务管理</h2>
                     <p>同时处理多个项目，轻松拖拽任务卡片进行优先级排序，设置截止日期和提醒。</p>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 10px; margin-top: 20px;">
-                        <div style="background: #e0f7fa; padding: 10px; border-radius: 8px; text-align: center;">项目A</div>
-                        <div style="background: #f1f8e9; padding: 10px; border-radius: 8px; text-align: center;">项目B</div>
-                        <div style="background: #ffecb3; padding: 10px; border-radius: 8px; text-align: center;">项目C</div>
-                        <div style="background: #ffccbc; padding: 10px; border-radius: 8px; text-align: center;">项目D</div>
-                        <div style="background: #e1bee7; padding: 10px; border-radius: 8px; text-align: center;">项目E</div>
-                        <div style="background: #bbdefb; padding: 10px; border-radius: 8px; text-align: center;">项目F</div>
+                    <div class="visual-grid">
+                        <div class="grid-item" style="background: #e0f7fa;">项目A</div>
+                        <div class="grid-item" style="background: #f1f8e9;">项目B</div>
+                        <div class="grid-item" style="background: #ffecb3;">项目C</div>
+                        <div class="grid-item" style="background: #ffccbc;">项目D</div>
+                        <div class="grid-item" style="background: #e1bee7;">项目E</div>
+                        <div class="grid-item" style="background: #bbdefb;">项目F</div>
                     </div>
                 </div>
                 
                 <div class="pc-card">
-                    <h2>高级编辑功能</h2>
+                    <h2><i class="fas fa-edit"></i>高级编辑功能</h2>
                     <p>支持富文本编辑、代码高亮、公式编辑等专业功能，满足各种文档处理需求。</p>
                     <div style="margin-top: 15px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
                         <p><strong>示例文档：</strong> 使用Markdown语法可以快速创建格式丰富的文档内容。</p>
@@ -430,19 +536,19 @@ function helloWorld() {
                 </div>
                 
                 <div class="pc-card">
-                    <h2>系统设置</h2>
+                    <h2><i class="fas fa-cog"></i>系统设置</h2>
                     <p>自定义界面主题、通知设置、快捷键配置等高级选项。</p>
                     <div style="margin-top: 15px;">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="width: 30px; height: 30px; background: #3498db; border-radius: 50%; margin-right: 10px;"></div>
+                        <div class="theme-selector">
+                            <div class="theme-color" style="background: #3498db;"></div>
                             <span>深色主题</span>
                         </div>
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <div style="width: 30px; height: 30px; background: #e0e0e0; border-radius: 50%; margin-right: 10px;"></div>
+                        <div class="theme-selector">
+                            <div class="theme-color" style="background: #e0e0e0;"></div>
                             <span>浅色主题</span>
                         </div>
-                        <div style="display: flex; align-items: center;">
-                            <div style="width: 30px; height: 30px; background: linear-gradient(90deg, #FF416C, #FF4B2B); border-radius: 50%; margin-right: 10px;"></div>
+                        <div class="theme-selector">
+                            <div class="theme-color" style="background: linear-gradient(90deg, #FF416C, #FF4B2B);"></div>
                             <span>自定义主题</span>
                         </div>
                     </div>
@@ -450,61 +556,8 @@ function helloWorld() {
             </div>
         </div>
         
-        <!-- 部署指南部分 -->
-        <div class="deployment-guide">
-            <h2>网站部署指南</h2>
-            <div class="deployment-steps">
-                <div class="deployment-step">
-                    <h3>保存HTML文件</h3>
-                    <p>将本页面另存为 <code>index.html</code> 文件</p>
-                </div>
-                <div class="deployment-step">
-                    <h3>选择托管平台</h3>
-                    <p>选择一个静态网站托管服务提供商：</p>
-                    <div class="provider-logos">
-                        <div class="provider-logo">
-                            <div style="font-weight: bold; color: #3498db;">GitHub Pages</div>
-                        </div>
-                        <div class="provider-logo">
-                            <div style="font-weight: bold; color: #2ecc71;">Netlify</div>
-                        </div>
-                        <div class="provider-logo">
-                            <div style="font-weight: bold; color: #9b59b6;">Vercel</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="deployment-step">
-                    <h3>部署到GitHub Pages</h3>
-                    <p>1. 创建GitHub仓库</p>
-                    <p>2. 上传index.html文件</p>
-                    <p>3. 在仓库设置中启用GitHub Pages</p>
-                    <div class="code-block">
-# 克隆仓库
-git clone https://github.com/username/repository.git
-
-# 添加文件
-cd repository
-echo "&lt;!DOCTYPE html&gt;..." > index.html
-
-# 提交并推送
-git add index.html
-git commit -m "添加自适应网站"
-git push origin main
-                    </div>
-                </div>
-                <div class="deployment-step">
-                    <h3>部署到Netlify</h3>
-                    <p>1. 访问 <a href="https://app.netlify.com" target="_blank">Netlify</a></p>
-                    <p>2. 将你的网站文件夹拖放到部署区域</p>
-                    <p>3. 等待自动部署完成</p>
-                </div>
-                <div class="deployment-step">
-                    <h3>自定义域名（可选）</h3>
-                    <p>1. 在域名注册商处购买域名</p>
-                    <p>2. 配置DNS指向托管服务提供的地址</p>
-                    <p>3. 在托管平台设置自定义域名</p>
-                </div>
-            </div>
+        <div class="footer">
+            <p>© test</p>
         </div>
     </div>
     
@@ -518,37 +571,45 @@ git push origin main
             
             <div class="mobile-content">
                 <div class="mobile-card">
-                    <h3>简洁导航</h3>
+                    <h3><i class="fas fa-compass"></i>简洁导航</h3>
                     <p>底部导航栏设计，轻松切换主要功能模块。</p>
                     <div style="display: flex; justify-content: space-around; background: #f5f7fa; padding: 15px; border-radius: 10px; margin-top: 15px;">
                         <div style="text-align: center;">
-                            <div style="width: 40px; height: 40px; background: #3498db; border-radius: 50%; margin: 0 auto 5px;"></div>
+                            <div style="width: 40px; height: 40px; background: #3498db; border-radius: 50%; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-home" style="color: white;"></i>
+                            </div>
                             <span>首页</span>
                         </div>
                         <div style="text-align: center;">
-                            <div style="width: 40px; height: 40px; background: #2ecc71; border-radius: 50%; margin: 0 auto 5px;"></div>
+                            <div style="width: 40px; height: 40px; background: #2ecc71; border-radius: 50%; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-search" style="color: white;"></i>
+                            </div>
                             <span>发现</span>
                         </div>
                         <div style="text-align: center;">
-                            <div style="width: 40px; height: 40px; background: #9b59b6; border-radius: 50%; margin: 0 auto 5px;"></div>
+                            <div style="width: 40px; height: 40px; background: #9b59b6; border-radius: 50%; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-comment" style="color: white;"></i>
+                            </div>
                             <span>消息</span>
                         </div>
                         <div style="text-align: center;">
-                            <div style="width: 40px; height: 40px; background: #e74c3c; border-radius: 50%; margin: 0 auto 5px;"></div>
+                            <div style="width: 40px; height: 40px; background: #e74c3c; border-radius: 50%; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-user" style="color: white;"></i>
+                            </div>
                             <span>我的</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="mobile-card">
-                    <h3>一键操作</h3>
+                    <h3><i class="fas fa-touchpad"></i>一键操作</h3>
                     <p>常用功能按钮放大设计，避免误触。</p>
-                    <button class="mobile-action">立即购买</button>
-                    <button class="mobile-action">联系客服</button>
+                    <button class="mobile-action"><i class="fas fa-shopping-cart"></i> 立即购买</button>
+                    <button class="mobile-action"><i class="fas fa-headset"></i> 联系客服</button>
                 </div>
                 
                 <div class="mobile-card">
-                    <h3>手势支持</h3>
+                    <h3><i class="fas fa-hand-point-up"></i>手势支持</h3>
                     <p>支持滑动、长按、捏合等移动端手势操作。</p>
                     <div style="display: flex; justify-content: space-around; margin-top: 15px;">
                         <div style="text-align: center;">
@@ -573,93 +634,43 @@ git push origin main
                 </div>
                 
                 <div class="mobile-card">
-                    <h3>节省流量</h3>
+                    <h3><i class="fas fa-battery-quarter"></i>节省流量</h3>
                     <p>图片延迟加载，数据压缩传输，减少移动数据消耗。</p>
                     <div style="margin-top: 15px; background: #e3f2fd; padding: 15px; border-radius: 10px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <div class="stats-bar">
                             <span>数据用量</span>
                             <span>1.2MB / 本月</span>
                         </div>
-                        <div style="height: 10px; background: #bbdefb; border-radius: 5px; overflow: hidden;">
-                            <div style="height: 100%; width: 35%; background: #2196f3;"></div>
+                        <div class="progress-bar">
+                            <div class="progress-value" style="width: 35%;"></div>
                         </div>
-                        <p style="text-align: center; margin-top: 10px; font-size: 0.9rem;">已节省约 4.8MB 流量</p>
+                        <p style="text-align: center; margin-top: 10px; font-size: 0.9rem; color: #27ae60;">
+                            <i class="fas fa-leaf"></i> 已节省约 4.8MB 流量
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- 移动端部署指南 -->
-        <div class="deployment-guide">
-            <h2>网站部署指南</h2>
-            <div class="deployment-steps">
-                <div class="deployment-step">
-                    <h3>保存HTML文件</h3>
-                    <p>将本页面另存为 <code>index.html</code> 文件</p>
-                </div>
-                <div class="deployment-step">
-                    <h3>选择托管平台</h3>
-                    <p>推荐使用以下静态网站托管服务：</p>
-                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px; flex: 1; min-width: 120px;">
-                            <h4 style="color: #3498db;">GitHub Pages</h4>
-                            <p>免费、简单、开发者友好</p>
-                        </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px; flex: 1; min-width: 120px;">
-                            <h4 style="color: #2ecc71;">Netlify</h4>
-                            <p>自动化部署、CDN加速</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="deployment-step">
-                    <h3>部署步骤</h3>
-                    <p>1. 访问托管平台网站</p>
-                    <p>2. 上传index.html文件</p>
-                    <p>3. 等待部署完成</p>
-                    <p>4. 访问生成的URL</p>
-                </div>
-                <div class="deployment-step">
-                    <h3>自定义域名</h3>
-                    <p>1. 购买域名（如阿里云、GoDaddy）</p>
-                    <p>2. 在托管平台添加自定义域名</p>
-                    <p>3. 配置DNS解析</p>
-                </div>
-            </div>
+        <div class="footer">
+            <p>© test</p>
         </div>
     </div>
-    
-    <!-- 测试按钮 -->
-    <button id="testButton" style="position: fixed; bottom: 20px; right: 20px; padding: 12px 24px; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;">
-        测试设备切换
-    </button>
     
     <script>
         // 设备检测函数 
         function detectDevice() {
             const userAgent = navigator.userAgent;
-            
-            // 常见移动设备检测
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-            
-            // 获取设备屏幕信息
-            const screenWidth = window.screen.width;
-            const screenHeight = window.screen.height;
-            
-            // 考虑平板设备（视为移动设备）
             const isTablet = /iPad|Android|Tablet/i.test(userAgent) && !/Mobile/i.test(userAgent);
-            
-            // 最终判断逻辑
-            // 如果检测到移动设备或屏幕较小，则视为移动设备
-            return isMobile || isTablet || screenWidth < 768;
+            return isMobile || isTablet || window.screen.width < 768;
         }
         
         // 页面加载时检测设备
         document.addEventListener('DOMContentLoaded', function() {
-            // 模拟加载延迟
             setTimeout(function() {
                 const isMobileDevice = detectDevice();
                 const loadingElement = document.getElementById('loading');
-                const deviceBanner = document.getElementById('deviceBanner');
                 const pcContainer = document.getElementById('pcContainer');
                 const mobileContainer = document.getElementById('mobileContainer');
                 
@@ -668,45 +679,14 @@ git push origin main
                 
                 if (isMobileDevice) {
                     // 移动设备
-                    deviceBanner.className = 'device-banner mobile-banner';
-                    deviceBanner.textContent = '您正在使用移动设备访问';
                     mobileContainer.style.display = 'block';
-                    
-                    // 应用移动端样式
                     document.body.style.background = 'linear-gradient(135deg, #a1ffce 0%, #faffd1 100%)';
                 } else {
                     // 电脑设备
-                    deviceBanner.className = 'device-banner pc-banner';
-                    deviceBanner.textContent = '您正在使用电脑设备访问';
                     pcContainer.style.display = 'block';
-                    
-                    // 应用PC端样式
                     document.body.style.background = 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)';
                 }
             }, 1500); // 模拟1.5秒加载时间
-        });
-        
-        // 设备切换测试按钮
-        document.getElementById('testButton').addEventListener('click', function() {
-            const pcContainer = document.getElementById('pcContainer');
-            const mobileContainer = document.getElementById('mobileContainer');
-            const deviceBanner = document.getElementById('deviceBanner');
-            
-            if (pcContainer.style.display === 'block') {
-                // 切换到移动视图
-                pcContainer.style.display = 'none';
-                mobileContainer.style.display = 'block';
-                deviceBanner.className = 'device-banner mobile-banner';
-                deviceBanner.textContent = '您正在使用移动设备访问 (测试模式)';
-                document.body.style.background = 'linear-gradient(135deg, #a1ffce 0%, #faffd1 100%)';
-            } else {
-                // 切换到PC视图
-                mobileContainer.style.display = 'none';
-                pcContainer.style.display = 'block';
-                deviceBanner.className = 'device-banner pc-banner';
-                deviceBanner.textContent = '您正在使用电脑设备访问 (测试模式)';
-                document.body.style.background = 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)';
-            }
         });
     </script>
 </body>
